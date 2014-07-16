@@ -1,13 +1,12 @@
-﻿using System.Diagnostics;
-using System.Text;
-using System.Threading;
-using Newtonsoft.Json;
-using uPLibrary.Networking.M2Mqtt.Messages;
-
-namespace Sms2Mqtt
+﻿namespace Sms2Mqtt
 {
-    using uPLibrary.Networking.M2Mqtt;
+    using Newtonsoft.Json;
     using System;
+    using System.Diagnostics;
+    using System.Text;
+    using System.Threading;
+    using uPLibrary.Networking.M2Mqtt;
+    using uPLibrary.Networking.M2Mqtt.Messages;
 
     class Program
     {
@@ -31,12 +30,12 @@ namespace Sms2Mqtt
                 var rawCmd = Encoding.UTF8.GetString(e.Message);
                 var command = JsonConvert.DeserializeObject<dynamic>(rawCmd);
 
-                Console.WriteLine("Received command [{0}] with body \"{1}\" on {2} from {3}", 
+                Console.WriteLine("Received command [{0}] with body \"{1}\" on {2} from {3}",
                     command.cmdId, command.body, command.date, command.src);
 
                 // You can reply to this message by including the cmdId
                 // /reply is special, this is how we send things to SMSCMD
-                var reply = JsonConvert.SerializeObject(new {cmdId = command.cmdId, body = command.body});
+                var reply = JsonConvert.SerializeObject(new { cmdId = command.cmdId, body = command.body });
                 var replyBytes = Encoding.UTF8.GetBytes(reply);
                 var puback = mqttClient.Publish(MqttPubTopic, replyBytes, MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false /* retain */);
                 Debug.WriteLine("Puback from sending {0}: {1}", reply, puback);
@@ -56,7 +55,7 @@ namespace Sms2Mqtt
                         // /cmds is special. This is how messages come from SMSCMD
                         var suback = mqttClient.Subscribe(new[] { MqttSubTopic }, new[] { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE });
                         Debug.WriteLine("Suback: {0}", suback);
-                        
+
                         Console.WriteLine("Connected!");
                         break;
                     }
